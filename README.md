@@ -1,4 +1,4 @@
-# liffxNuxtxVuetify
+# liffxNuxtxVuetify learnWith CodeTraveler
 
 ## Build Setup
 
