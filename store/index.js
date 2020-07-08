@@ -8,6 +8,11 @@ export const state = () => ({
     firstName: '',
     lastName: '',
     gender: 1,
+    email: '',
+    phone: '',
+    birthday: new Date().toISOString().substr(0, 10),
+    company: '',
+    position: '',
   },
 })
 

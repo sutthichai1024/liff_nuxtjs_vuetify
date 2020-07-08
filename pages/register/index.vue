@@ -87,9 +87,9 @@ export default {
   data() {
     return {
       form: {
-        firstName: '',
-        lastName: '',
-        gender: 1,
+        firstName: this.$store.getters.getRegister.firstName,
+        lastName: this.$store.getters.getRegister.lastName,
+        gender: this.$store.getters.getRegister.gender,
       },
     }
   },
