@@ -80,12 +80,20 @@
         </v-col>
       </v-row>
     </v-container>
+    <v-dialog v-model="dialog" max-width="290">
+      <v-card>
+        <v-card-title>Form Errors</v-card-title>
+        <v-card-text v-html="errMsg"></v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 <script>
 export default {
   data() {
     return {
+      dialog: false,
+      errMsg: '',
       form: {
         firstName: '',
         lastName: '',
@@ -97,8 +105,26 @@ export default {
     chooseGender(gender) {
       this.form.gender = gender
     },
+    validate() {
+      let validated = true
+      const errors = []
+      const validatorField = ['firstName', 'lastName']
+      validatorField.forEach((field) => {
+        if (this.form[field] === '') {
+          validated = false
+          errors.push(`${field} can not be null`)
+        }
+      })
+      if (!validated) {
+        this.errMsg = errors.map((err) => err + '<br/>').join('')
+        this.dialog = true
+      }
+      return validated
+    },
     next() {
-      this.$router.push('register/step2')
+      if (this.validate()) {
+        this.$router.push('register/step2')
+      }
     },
   },
 }
