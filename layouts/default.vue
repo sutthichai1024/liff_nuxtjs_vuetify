@@ -46,5 +46,15 @@ export default {
   height: auto;
   padding: 10px 0 !important;
   font-weight: bold;
+  min-height: 50px;
+  &.outlined {
+    border: 1px solid #1a56be;
+    border-radius: 28px;
+    line-height: normal;
+  }
+}
+
+.set-pading {
+  padding: 0 10px;
 }
 </style>
