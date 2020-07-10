@@ -34,6 +34,10 @@ export default {
         href:
           'https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap',
       },
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/icon?family=Material+Icons',
+      },
     ],
   },
   /*
