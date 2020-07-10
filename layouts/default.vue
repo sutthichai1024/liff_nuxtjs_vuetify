@@ -30,7 +30,7 @@ export default {
 }
 
 .text-primary {
-  color: #1a56be;
+  color: #1a56be !important;
   font-weight: bold;
 }
 
@@ -53,7 +53,6 @@ export default {
     line-height: normal;
   }
 }
-
 .set-pading {
   padding: 0 10px;
 }

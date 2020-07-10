@@ -11,65 +11,19 @@
           </div>
         </v-col>
         <v-col cols="12">
-          <v-card class="mx-auto" max-width="400">
-            <v-img
-              class="white--text align-end"
-              height="200px"
-              src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-            >
-              <div class="more-detail">More Detail</div>
-            </v-img>
-            <div class="card-content">
-              <div>
-                <v-card-text class="text--primary">
-                  <h1>Design Thinking 1</h1>
-                </v-card-text>
-                <v-card-subtitle class="pt-0">DMC Team Dev</v-card-subtitle>
-              </div>
-              <v-btn class="circle"><v-icon>check</v-icon></v-btn>
-            </div>
-          </v-card>
-        </v-col>
-        <v-col cols="12">
-          <v-card class="mx-auto active" max-width="400">
-            <v-img
-              class="white--text align-end"
-              height="200px"
-              src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-            >
-              <div class="more-detail">More Detail</div>
-            </v-img>
-            <div class="card-content">
-              <div>
-                <v-card-text class="text--primary">
-                  <h1>Design Thinking 2</h1>
-                </v-card-text>
-                <v-card-subtitle class="pt-0">DMC Team Dev</v-card-subtitle>
-              </div>
-              <v-btn class="circle"><v-icon>check</v-icon></v-btn>
-            </div>
-          </v-card>
-        </v-col>
-        <v-col cols="12">
-          <v-card class="mx-auto" max-width="400">
-            <v-img
-              class="white--text align-end"
-              height="200px"
-              src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-            >
-              <div class="more-detail">More Detail</div>
-            </v-img>
-            <div class="card-content">
-              <div>
-                <v-card-text class="text--primary">
-                  <h1>Design Thinking 3</h1>
-                </v-card-text>
-                <v-card-subtitle class="pt-0">DMC Team Dev</v-card-subtitle>
-              </div>
-              <v-btn class="circle"><v-icon>check</v-icon></v-btn>
-            </div>
-          </v-card>
-        </v-col>
+          <Card
+            :active="selectedWorkshop === 1"
+            @moreDetail="moreDetail"
+            @chooseWorkshop="chooseWorkshop(1)" />
+          <Card
+            :active="selectedWorkshop === 2"
+            @moreDetail="moreDetail"
+            @chooseWorkshop="chooseWorkshop(2)" />
+          <Card
+            :active="selectedWorkshop === 3"
+            @moreDetail="moreDetail"
+            @chooseWorkshop="chooseWorkshop(3)"
+        /></v-col>
         <v-col>
           <div class="set-padding">
             <v-btn rounded color="primary w-100 mt-3 my-btn" dark @click="next"
@@ -78,74 +32,81 @@
           </div>
         </v-col>
       </v-row>
+      <v-dialog v-model="dialog" max-width="290">
+        <v-card class="dialog-card">
+          <v-img
+            class="white--text align-end"
+            height="200px"
+            src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+          >
+          </v-img>
+          <v-card-title class="headline">Design Thinking 1</v-card-title>
+
+          <v-card-text>
+            <p>Time : 13.00 - 16.30</p>
+            <p>place : Room 102</p>
+            <p class="detail">
+              Design Thinking is a design methodology that provides a
+              solution-base approach to solving problem. We will focus on the
+              five-stage Design Thinking model, Empathize ,define(the problem),
+              Ideate , Prototype and test
+            </p>
+            <p>
+              Speaker <br />
+              - Miss Yao <br />
+              - Miss Tam
+            </p>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn class="text-primary" text @click="dialog = false">
+              Ok
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-container>
   </div>
 </template>
 
 <script>
+import Card from '~/components/Card'
 export default {
+  components: {
+    Card,
+  },
+  data() {
+    return {
+      dialog: false,
+      selectedWorkshop: 0,
+    }
+  },
   methods: {
     next() {},
+    moreDetail() {
+      this.dialog = true
+    },
+    chooseWorkshop(id) {
+      this.selectedWorkshop = id
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.more-detail {
-  font-size: 12px;
-  color: #1a56be;
-  border-radius: 25px;
-  padding: 10px 20px;
-  background: #fff;
-  font-weight: bold;
-  display: inline;
-  position: absolute;
-  bottom: 11px;
-  right: 11px;
-}
-.v-card__text {
-  padding: 0;
-  padding-bottom: 5px;
-  h1 {
-    font-size: 24px;
+.dialog-card {
+  p {
+    margin-bottom: 0;
   }
-}
-.circle {
-  border-radius: 50%;
-  height: 32px !important;
-  width: 32px !important;
-  min-width: auto !important;
-  color: #fff;
-  background: rgba($color: #1a56be, $alpha: 0.3) !important;
-  align-self: center;
-}
-.card-content {
-  display: flex;
-  justify-content: space-between;
-  padding: 15px;
-}
-.v-card__subtitle {
-  padding: 0;
-}
-.v-card + .v-card {
-  margin-top: 30px;
-}
-.v-card.active {
-  .circle {
-    background: rgba($color: #1a56be, $alpha: 1) !important;
+  .v-card__title.headline {
+    font-size: 20px !important;
   }
-  .v-image {
-    &::before {
-      content: 'Selected';
-      font-weight: bold;
-      height: 100%;
-      width: 100%;
-      font-size: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba($color: #1a56be, $alpha: 1) !important;
-    }
+  .v-card__text {
+    padding-bottom: 0;
+  }
+  .detail {
+    margin: 10px 0;
   }
 }
 </style>
