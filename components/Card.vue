@@ -14,9 +14,9 @@
     <div class="card-content">
       <div>
         <v-card-text class="text--primary">
-          <h1>Design Thinking 1</h1>
+          <h1>{{ sessions.title }}</h1>
         </v-card-text>
-        <v-card-subtitle class="pt-0">DMC Team Dev</v-card-subtitle>
+        <v-card-subtitle class="pt-0">{{ sessions.spaker }}</v-card-subtitle>
       </div>
       <v-btn class="circle" @click="$emit('chooseWorkshop')"
         ><v-icon>check</v-icon></v-btn
@@ -26,7 +26,7 @@
 </template>
 <script>
 export default {
-  props: ['active'],
+  props: ['active', 'sessions'],
 }
 </script>
 <style lang="scss" scoped>

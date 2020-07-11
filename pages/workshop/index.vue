@@ -7,60 +7,56 @@
       <v-row>
         <v-col cols="12">
           <div class="mt-3 text-primary text-title text-center">
-            10 July 2020
+            {{ list.date }}
           </div>
         </v-col>
         <v-col cols="12">
           <Card
-            :active="selectedWorkshop === 1"
-            @moreDetail="moreDetail"
-            @chooseWorkshop="chooseWorkshop(1)" />
-          <Card
-            :active="selectedWorkshop === 2"
-            @moreDetail="moreDetail"
-            @chooseWorkshop="chooseWorkshop(2)" />
-          <Card
-            :active="selectedWorkshop === 3"
-            @moreDetail="moreDetail"
-            @chooseWorkshop="chooseWorkshop(3)"
-        /></v-col>
+            v-for="item in list.sessions"
+            :key="item.id"
+            :sessions="item"
+            :active="selectedWorkshop.includes(item.id)"
+            @moreDetail="moreDetail(item)"
+            @chooseWorkshop="chooseWorkshop(item)"
+          />
+        </v-col>
         <v-col>
           <div class="set-padding">
             <v-btn rounded color="primary w-100 mt-3 my-btn" dark @click="next"
               >Next</v-btn
             >
           </div>
+          <div
+            v-if="index > 0"
+            class="w-100 text-center my-btn text-primary"
+            @click="back"
+          >
+            Back
+          </div>
         </v-col>
       </v-row>
-      <v-dialog v-model="dialog" max-width="290">
+      <v-dialog v-model="isShowDialog" max-width="290">
         <v-card class="dialog-card">
           <v-img
             class="white--text align-end"
             height="200px"
-            src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+            :src="dialog.image"
           >
           </v-img>
-          <v-card-title class="headline">Design Thinking 1</v-card-title>
+          <v-card-title class="headline">{{ dialog.title }}</v-card-title>
 
           <v-card-text>
-            <p>Time : 13.00 - 16.30</p>
-            <p>place : Room 102</p>
+            <p>Time : {{ dialog.time }}</p>
+            <p>place : {{ dialog.place }}</p>
             <p class="detail">
-              Design Thinking is a design methodology that provides a
-              solution-base approach to solving problem. We will focus on the
-              five-stage Design Thinking model, Empathize ,define(the problem),
-              Ideate , Prototype and test
+              {{ dialog.detail }}
             </p>
-            <p>
-              Speaker <br />
-              - Miss Yao <br />
-              - Miss Tam
-            </p>
+            <p>Speker : {{ dialog.spaker }}</p>
           </v-card-text>
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn class="text-primary" text @click="dialog = false">
+            <v-btn class="text-primary" text @click="isShowDialog = false">
               Ok
             </v-btn>
           </v-card-actions>
@@ -78,17 +74,54 @@ export default {
   },
   data() {
     return {
-      dialog: false,
-      selectedWorkshop: 0,
+      isShowDialog: false,
+      index: 0,
+      dialog: {
+        title: '',
+        time: '',
+        place: '',
+        image: '',
+        detail: '',
+        spaker: '',
+      },
+      selectedWorkshop: [],
+      list: [],
+      workshop: this.$store.getters.getWorkshop,
     }
   },
+  mounted() {
+    this.list = this.workshop[this.index]
+  },
   methods: {
-    next() {},
-    moreDetail() {
-      this.dialog = true
+    next() {
+      if (this.index === this.workshop.length - 1) {
+        this.$axios
+          .patch(
+            `https://liff-nuxtjs-vuetify.firebaseio.com/workshops/line:0001.json`,
+            { ...this.selectedWorkshop }
+          )
+          .then((res) => {
+            this.$router.push('/workshop/done')
+          })
+      } else {
+        this.index = this.index + 1
+        this.list = this.workshop[this.index]
+      }
     },
-    chooseWorkshop(id) {
-      this.selectedWorkshop = id
+    moreDetail(item) {
+      this.isShowDialog = true
+      this.dialog = item
+    },
+    chooseWorkshop(item) {
+      const listId = this.list.sessions.map((session) => session.id)
+      this.selectedWorkshop = this.selectedWorkshop.filter(
+        (session) => !listId.includes(session)
+      )
+      this.selectedWorkshop.push(item.id)
+    },
+    back() {
+      this.index = this.index - 1
+      this.list = this.workshop[this.index]
     },
   },
 }
