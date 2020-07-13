@@ -7,68 +7,18 @@
       <v-row>
         <v-col cols="12">
           <div class="mt-3 text-primary text-title text-center">
-            10 July 2020
+            {{ list.date }}
           </div>
         </v-col>
         <v-col cols="12">
-          <v-card class="mx-auto" max-width="400">
-            <v-img
-              class="white--text align-end"
-              height="200px"
-              src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-            >
-              <div class="more-detail">More Detail</div>
-            </v-img>
-            <div class="card-content">
-              <div>
-                <v-card-text class="text--primary">
-                  <h1>Design Thinking 1</h1>
-                </v-card-text>
-                <v-card-subtitle class="pt-0">DMC Team Dev</v-card-subtitle>
-              </div>
-              <v-btn class="circle"><v-icon>check</v-icon></v-btn>
-            </div>
-          </v-card>
-        </v-col>
-        <v-col cols="12">
-          <v-card class="mx-auto active" max-width="400">
-            <v-img
-              class="white--text align-end"
-              height="200px"
-              src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-            >
-              <div class="more-detail">More Detail</div>
-            </v-img>
-            <div class="card-content">
-              <div>
-                <v-card-text class="text--primary">
-                  <h1>Design Thinking 2</h1>
-                </v-card-text>
-                <v-card-subtitle class="pt-0">DMC Team Dev</v-card-subtitle>
-              </div>
-              <v-btn class="circle"><v-icon>check</v-icon></v-btn>
-            </div>
-          </v-card>
-        </v-col>
-        <v-col cols="12">
-          <v-card class="mx-auto" max-width="400">
-            <v-img
-              class="white--text align-end"
-              height="200px"
-              src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-            >
-              <div class="more-detail">More Detail</div>
-            </v-img>
-            <div class="card-content">
-              <div>
-                <v-card-text class="text--primary">
-                  <h1>Design Thinking 3</h1>
-                </v-card-text>
-                <v-card-subtitle class="pt-0">DMC Team Dev</v-card-subtitle>
-              </div>
-              <v-btn class="circle"><v-icon>check</v-icon></v-btn>
-            </div>
-          </v-card>
+          <Card
+            v-for="item in list.sessions"
+            :key="item.id"
+            :sessions="item"
+            :active="selectedWorkshop.includes(item.id)"
+            @moreDetail="moreDetail(item)"
+            @chooseWorkshop="chooseWorkshop(item)"
+          />
         </v-col>
         <v-col>
           <div class="set-padding">
@@ -76,76 +26,120 @@
               >Next</v-btn
             >
           </div>
+          <div
+            v-if="index > 0"
+            class="w-100 text-center my-btn text-primary"
+            @click="back"
+          >
+            Back
+          </div>
         </v-col>
       </v-row>
+      <v-dialog v-model="isShowDialog" max-width="290">
+        <v-card class="dialog-card">
+          <v-img
+            class="white--text align-end"
+            height="200px"
+            :src="dialog.image"
+          >
+          </v-img>
+          <v-card-title class="headline">{{ dialog.title }}</v-card-title>
+
+          <v-card-text>
+            <p>Time : {{ dialog.time }}</p>
+            <p>place : {{ dialog.place }}</p>
+            <p class="detail">
+              {{ dialog.detail }}
+            </p>
+            <p>Speker : {{ dialog.spaker }}</p>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn class="text-primary" text @click="isShowDialog = false">
+              Ok
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-container>
   </div>
 </template>
 
 <script>
+import Card from '~/components/Card'
 export default {
+  components: {
+    Card,
+  },
+  data() {
+    return {
+      isShowDialog: false,
+      index: 0,
+      dialog: {
+        title: '',
+        time: '',
+        place: '',
+        image: '',
+        detail: '',
+        spaker: '',
+      },
+      selectedWorkshop: [],
+      list: [],
+      workshop: this.$store.getters.getWorkshop,
+    }
+  },
+  mounted() {
+    this.list = this.workshop[this.index]
+  },
   methods: {
-    next() {},
+    next() {
+      if (this.index === this.workshop.length - 1) {
+        this.$axios
+          .patch(
+            `https://liff-nuxtjs-vuetify.firebaseio.com/workshops/line:0001.json`,
+            { ...this.selectedWorkshop }
+          )
+          .then((res) => {
+            this.$router.push('/workshop/done')
+          })
+      } else {
+        this.index = this.index + 1
+        this.list = this.workshop[this.index]
+      }
+    },
+    moreDetail(item) {
+      this.isShowDialog = true
+      this.dialog = item
+    },
+    chooseWorkshop(item) {
+      const listId = this.list.sessions.map((session) => session.id)
+      this.selectedWorkshop = this.selectedWorkshop.filter(
+        (session) => !listId.includes(session)
+      )
+      this.selectedWorkshop.push(item.id)
+    },
+    back() {
+      this.index = this.index - 1
+      this.list = this.workshop[this.index]
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.more-detail {
-  font-size: 12px;
-  color: #1a56be;
-  border-radius: 25px;
-  padding: 10px 20px;
-  background: #fff;
-  font-weight: bold;
-  display: inline;
-  position: absolute;
-  bottom: 11px;
-  right: 11px;
-}
-.v-card__text {
-  padding: 0;
-  padding-bottom: 5px;
-  h1 {
-    font-size: 24px;
+.dialog-card {
+  p {
+    margin-bottom: 0;
   }
-}
-.circle {
-  border-radius: 50%;
-  height: 32px !important;
-  width: 32px !important;
-  min-width: auto !important;
-  color: #fff;
-  background: rgba($color: #1a56be, $alpha: 0.3) !important;
-  align-self: center;
-}
-.card-content {
-  display: flex;
-  justify-content: space-between;
-  padding: 15px;
-}
-.v-card__subtitle {
-  padding: 0;
-}
-.v-card + .v-card {
-  margin-top: 30px;
-}
-.v-card.active {
-  .circle {
-    background: rgba($color: #1a56be, $alpha: 1) !important;
+  .v-card__title.headline {
+    font-size: 20px !important;
   }
-  .v-image {
-    &::before {
-      content: 'Selected';
-      font-weight: bold;
-      height: 100%;
-      width: 100%;
-      font-size: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba($color: #1a56be, $alpha: 1) !important;
-    }
+  .v-card__text {
+    padding-bottom: 0;
+  }
+  .detail {
+    margin: 10px 0;
   }
 }
 </style>
