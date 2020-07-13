@@ -5,95 +5,69 @@
     </v-app-bar>
     <v-sheet elevation="6">
       <v-tabs v-model="tab" grow>
-        <v-tab v-for="item in items" :key="item.tab">
-          {{ item.tab }}
+        <v-tab v-for="item in agenda" :key="item.date">
+          {{ item.date }}
         </v-tab>
       </v-tabs>
     </v-sheet>
     <v-tabs-items v-model="tab">
-      <v-tab-item v-for="item in items" :key="item.tab">
+      <v-tab-item v-for="item in agenda" :key="item.date">
         <v-container class="pt-0">
           <v-row>
-            <v-col cols="12">
-              <v-card class="agenda-card">
-                <v-card-text>
-                  <p class="time mb-0">10:00 - 11:45</p>
+            <v-col
+              v-for="session in item.sessions"
+              :key="session.title"
+              cols="12"
+            >
+              <v-card
+                class="agenda-card"
+                :class="session.type === 'set' ? 'card-set' : ''"
+              >
+                <v-card-text v-if="session.type !== 'set'">
+                  <p class="time mb-0">{{ session.time }}</p>
                   <v-row>
                     <v-col cols="4" class="text-center pt-2 pb-0">
-                      <img
-                        src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-                        class="agenda-image"
-                      />
+                      <img :src="session.image" class="agenda-image" />
                     </v-col>
                     <v-col cols="8" class="pt-2 pb-0">
                       <v-card-title
                         class="pl-0 pt-0 pb-3 text-primary text-title"
-                        >INTRODUCTIONS</v-card-title
-                      ><v-card-subtitle class="pl-0 pt-0 pb-0"
-                        >DMC Team</v-card-subtitle
-                      >
+                        >{{ session.title }}</v-card-title
+                      ><v-card-subtitle class="pl-0 pt-0 pb-0">{{
+                        session.spaker
+                      }}</v-card-subtitle>
                     </v-col>
                   </v-row>
                 </v-card-text>
-              </v-card>
-              <v-card class="agenda-card card-set">
-                <v-card-text>
-                  <p class="time mb-0">10:00 - 11:45</p>
-                  <v-row>
-                    <v-col cols="4" class="text-center pt-2 pb-0">
-                      <img
-                        src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-                        class="agenda-image"
-                      />
-                    </v-col>
-                    <v-col cols="8" class="pt-2 pb-0">
-                      <v-card-title
-                        class="pl-0 pt-0 pb-3 text-primary text-title"
-                        >INTRODUCTIONS</v-card-title
-                      ><v-card-subtitle class="pl-0 pt-0 pb-0"
-                        >DMC Team</v-card-subtitle
-                      >
-                    </v-col>
-                  </v-row>
-                </v-card-text>
-                <hr />
-                <v-card-text>
-                  <v-row>
-                    <v-col cols="4" class="text-center pt-2 pb-0">
-                      <img
-                        src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-                        class="agenda-image"
-                      />
-                    </v-col>
-                    <v-col cols="8" class="pt-2 pb-0">
-                      <v-card-title
-                        class="pl-0 pt-0 pb-3 text-primary text-title"
-                        >INTRODUCTIONS</v-card-title
-                      ><v-card-subtitle class="pl-0 pt-0 pb-0"
-                        >DMC Team</v-card-subtitle
-                      >
-                    </v-col>
-                  </v-row>
-                </v-card-text>
-                <hr />
-                <v-card-text>
-                  <v-row>
-                    <v-col cols="4" class="text-center pt-2 pb-0">
-                      <img
-                        src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-                        class="agenda-image"
-                      />
-                    </v-col>
-                    <v-col cols="8" class="pt-2 pb-0">
-                      <v-card-title
-                        class="pl-0 pt-0 pb-3 text-primary text-title"
-                        >INTRODUCTIONS</v-card-title
-                      ><v-card-subtitle class="pl-0 pt-0 pb-0"
-                        >DMC Team</v-card-subtitle
-                      >
-                    </v-col>
-                  </v-row>
-                </v-card-text>
+                <div v-else>
+                  <v-card-text
+                    v-for="sessionSet in session.sessionSet"
+                    :key="sessionSet.title"
+                  >
+                    <p class="time mb-0">{{ session.time }}</p>
+                    <v-row>
+                      <v-col cols="4" class="text-center pt-2 pb-0">
+                        <img :src="sessionSet.image" class="agenda-image" />
+                      </v-col>
+                      <v-col cols="8" class="pt-2 pb-0">
+                        <v-card-title
+                          class="pl-0 pt-0 pb-3 text-primary text-title"
+                          >{{ sessionSet.title }}</v-card-title
+                        ><v-card-subtitle class="pl-0 pt-0 pb-0">{{
+                          sessionSet.spaker
+                        }}</v-card-subtitle>
+                        <p>{{ sessionSet.duringTime }}</p>
+                      </v-col>
+                    </v-row>
+                    <hr
+                      v-if="
+                        sessionSet !==
+                        session.sessionSet[session.sessionSet.length - 1]
+                      "
+                      class="mb-0"
+                    />
+                  </v-card-text>
+                </div>
               </v-card>
             </v-col>
           </v-row>
@@ -104,6 +78,12 @@
 </template>
 <script>
 export default {
+  asyncData({ store }) {
+    // apis
+    return {
+      agenda: store.getters.getAgenda,
+    }
+  },
   data() {
     return {
       tab: null,
@@ -131,6 +111,7 @@ export default {
   }
 }
 .agenda-card {
+  color: 4d4d4d;
   .time {
     color: #1a56be;
     font-weight: bold;
@@ -146,10 +127,13 @@ export default {
   }
   &.card-set {
     border-left: 3px solid #1a56be;
+    .v-card__text + .v-card__text {
+      padding-top: 0 !important;
+    }
   }
   hr {
-    width: 80%;
-    margin: 0 auto;
+    width: 100%;
+    margin: 15px auto 0;
     height: 1px;
     background: #bdbdbd;
     border: 0;
