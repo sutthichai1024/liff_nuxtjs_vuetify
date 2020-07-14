@@ -47,7 +47,10 @@ export default {
     workshop() {
       this.$router.push('workshop')
     },
-    close() {},
+    close() {
+      const liff = window.liff
+      liff.closeWindow()
+    },
   },
 }
 </script>

@@ -39,6 +39,9 @@ export default {
         href: 'https://fonts.googleapis.com/icon?family=Material+Icons',
       },
     ],
+    script: [
+      { src: 'https://static.line-scdn.net/liff/edge/versions/2.3.0/sdk.js' },
+    ],
   },
   /*
    ** Global CSS

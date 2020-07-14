@@ -10,11 +10,17 @@
             Step 1 of 2
           </div>
         </v-col>
-        <v-col cols="12" class="text-center pb-0">
-          <img src="~/assets/profile.png" alt="" width="155" />
+        <v-col cols="12" class="text-center pb-0 profile-image">
+          <img
+            v-if="getLine.pictureUrl === ''"
+            src="~/assets/profile.png"
+            alt=""
+            width="155"
+          />
+          <img v-else :src="getLine.pictureUrl" alt="" width="155" />
         </v-col>
         <v-col cols="12" class="text-center pt-2 pb-0">
-          Display Name
+          {{ getLine.displayName }}
         </v-col>
         <v-col cols="12">
           <v-form>
@@ -93,7 +99,35 @@ export default {
       },
     }
   },
+  computed: {
+    getLine() {
+      return this.$store.getters.getLine
+    },
+  },
+  async mounted() {
+    const liff = window.liff
+    await liff.init({ liffId: '1654393024-zLbLGGnE' })
+    if (liff.isLoggedIn()) {
+      liff.getProfile().then((profile) => {
+        this.$store.dispatch('setLine', profile)
+        this.isDone()
+      })
+    } else {
+      liff.login()
+    }
+  },
   methods: {
+    isDone() {
+      this.$axios
+        .get(
+          `https://liff-nuxtjs-vuetify.firebaseio.com/members/${this.$store.getters.getLine.userId}/profile.json`
+        )
+        .then((res) => {
+          if (res.data != null) {
+            this.$router.push('/register/done')
+          }
+        })
+    },
     chooseGender(gender) {
       this.form.gender = gender
     },
@@ -150,6 +184,11 @@ export default {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+  }
+}
+.profile-image {
+  img {
+    border-radius: 50%;
   }
 }
 </style>

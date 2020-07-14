@@ -4,6 +4,11 @@ export const state = () => ({
     title: '',
     message: '',
   },
+  line: {
+    pictureUrl: null,
+    displayName: null,
+    userId: null,
+  },
   survey: {
     survey1: 5,
     survey2: '',
@@ -174,6 +179,9 @@ export const getters = {
   getSurvey(state) {
     return state.survey
   },
+  getLine(state) {
+    return state.line
+  },
 }
 
 export const mutations = {
@@ -195,6 +203,12 @@ export const mutations = {
       ...data,
     }
   },
+  SET_LINE(state, data) {
+    state.line = {
+      ...state.line,
+      ...data,
+    }
+  },
 }
 
 export const actions = {
@@ -206,5 +220,8 @@ export const actions = {
   },
   setSurvey({ commit }, data) {
     commit('SET_SURVEY', data)
+  },
+  setLine({ commit }, data) {
+    commit('SET_LINE', data)
   },
 }

@@ -174,7 +174,7 @@ export default {
         this.$store.dispatch('setRegister', this.form)
         this.$axios
           .patch(
-            `https://liff-nuxtjs-vuetify.firebaseio.com/members/line:0001/profile.json`,
+            `https://liff-nuxtjs-vuetify.firebaseio.com/members/${this.$store.getters.getLine.userId}/profile.json`,
             this.$store.getters.getRegister
           )
           .then((res) => {
