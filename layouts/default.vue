@@ -56,6 +56,9 @@ export default {
     line-height: normal;
   }
 }
+.mt-100 {
+  margin-top: 100px;
+}
 .set-pading {
   padding: 0 10px;
 }

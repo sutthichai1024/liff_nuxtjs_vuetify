@@ -13,7 +13,7 @@
       </v-row>
       <v-row justify="center">
         <v-col cols="10">
-          <h2 class="text-center mt-1">
+          <h2 class="text-center mt-1 question">
             How would you rate <br />the event overall ?
           </h2>
         </v-col>
@@ -25,7 +25,7 @@
             :min="0"
             thumb-label="always"
           ></v-slider>
-          <v-btn rounded color="primary w-100 my-btn" dark @click="next"
+          <v-btn rounded color="primary w-100 mt-100" dark @click="next"
             >Next</v-btn
           >
         </v-col>
@@ -37,25 +37,14 @@
 export default {
   data() {
     return {
-      satisfactionEmojis: [
-        '😭',
-        '😢',
-        '☹️',
-        '🙁',
-        '😐',
-        '🙂',
-        '😊',
-        '😁',
-        '😄',
-        '😍',
-      ],
       form: {
-        survey1: 5,
+        survey1: this.$store.getters.getSurvey.survey1,
       },
     }
   },
   methods: {
     next() {
+      this.$store.dispatch('setSurvey', this.form)
       this.$axios
         .patch(
           `https://liff-nuxtjs-vuetify.firebaseio.com/survey/line:0001.json`,
@@ -90,7 +79,7 @@ export default {
     }
   }
 }
-.my-btn {
-  margin-top: 100px;
+.question {
+  font-size: 20px;
 }
 </style>
