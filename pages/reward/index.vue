@@ -19,62 +19,22 @@
                 </div>
                 <div class="align-self-center">
                   <h2 class="name text-primary m-0">
-                    {{ getLine.displayName }}
+                    {{ getUser.firstName }}
                   </h2>
                 </div>
               </div>
             </v-card-text>
             <div class="stamp-zone">
-              <div class="stamp">
-                <div class="circle active">
-                  <span>1</span>
+              <div v-for="(obj, index) in stamps" :key="index" class="stamp">
+                <div
+                  v-if="index !== Object.keys(stamps).length - 1"
+                  :class="obj.value === true ? 'active' : ''"
+                  class="circle"
+                >
+                  <span>{{ ++index }}</span>
                   <v-icon>check</v-icon>
                 </div>
-              </div>
-              <div class="stamp">
-                <div class="circle">
-                  <span>2</span>
-                  <v-icon>check</v-icon>
-                </div>
-              </div>
-
-              <div class="stamp">
-                <div class="circle">
-                  <span>3</span>
-                  <v-icon>check</v-icon>
-                </div>
-              </div>
-
-              <div class="stamp">
-                <div class="circle">
-                  <span>4</span>
-                  <v-icon>check</v-icon>
-                </div>
-              </div>
-
-              <div class="stamp">
-                <div class="circle">
-                  <span>5</span>
-                  <v-icon>check</v-icon>
-                </div>
-              </div>
-
-              <div class="stamp">
-                <div class="circle">
-                  <span>6</span>
-                  <v-icon>check</v-icon>
-                </div>
-              </div>
-
-              <div class="stamp">
-                <div class="circle">
-                  <span>7</span>
-                  <v-icon>check</v-icon>
-                </div>
-              </div>
-
-              <div class="stamp">
-                <div class="circle end">
+                <div v-else class="circle end">
                   <span>Goal</span>
                   <v-icon>check</v-icon>
                 </div>
@@ -90,6 +50,7 @@
             color="primary w-100 mt-10 my-btn scan"
             dark
             @click="scan"
+            v-if='isDone === false'
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -203,7 +164,7 @@
             </svg>
             Scan to collect</v-btn
           >
-          <v-btn rounded color="primary w-100 mt-10 my-btn" dark @click="next"
+          <v-btn v-if='isDone === true' rounded color="primary w-100 mt-10 my-btn" dark @click="next"
             >Redeem Reward</v-btn
           >
         </v-col>
@@ -213,10 +174,61 @@
 </template>
 <script>
 export default {
+  data() {
+    return {
+      stamps: [
+        {
+          name: 'stamp1',
+          value: false,
+        },
+        {
+          name: 'stamp2',
+          value: false,
+        },
+        {
+          name: 'stamp3',
+          value: false,
+        },
+        {
+          name: 'stamp4',
+          value: false,
+        },
+        {
+          name: 'stamp5',
+          value: false,
+        },
+        {
+          name: 'stamp6',
+          value: false,
+        },
+        {
+          name: 'stamp7',
+          value: false,
+        },
+        {
+          name: 'stamp8',
+          value: false,
+        },
+      ],
+    }
+  },
   computed: {
     getLine() {
       return this.$store.getters.getLine
     },
+    getUser() {
+      return this.$store.getters.getUser
+    },
+    isDone() {
+      let isDone = true
+      this.stamps.forEach(element => {
+          if(element === false){
+            isDone =false
+            return isDone
+          }
+      });
+      return isDone
+    }
   },
   async mounted() {
     const liff = window.liff
@@ -224,13 +236,55 @@ export default {
     if (liff.isLoggedIn()) {
       liff.getProfile().then((profile) => {
         this.$store.dispatch('setLine', profile)
-        this.isDone()
+        this.$axios
+          .get(
+            `https://liff-nuxtjs-vuetify.firebaseio.com/members/${this.$store.getters.getLine.userId}/profile.json`
+          )
+          .then((res) => {
+            if (res.data != null) {
+              this.$store.dispatch('setUser', res.data)
+            }
+          })
+        this.$axios
+          .get(
+            `https://liff-nuxtjs-vuetify.firebaseio.com/rewards/${this.$store.getters.getLine.userId}.json`
+          )
+          .then((res) => {
+            if (res.data != null) {
+              this.stamps = res.data
+            }
+          })
       })
     } else {
       liff.login()
     }
   },
-  methods: {},
+  methods: {
+    scan() {
+      const liff = window.liff
+      liff
+        .scanCode()
+        .then((result) => {
+          this.stamps = this.stamps.map((obj) => {
+            if (obj.name === result.value) {
+              obj.value = true
+            }
+            return obj
+          })
+          this.$axios
+            .patch(
+              `https://liff-nuxtjs-vuetify.firebaseio.com/rewards/${this.$store.getters.getLine.userId}.json`,
+              { ...this.stamps }
+            )
+            .then((res) => {})
+            .catch((e) => alert(e))
+        })
+        .catch((e) => alert(e))
+    },
+    next() {
+      this.$router.push('reward/done');
+    },
+  },
 }
 </script>
 
